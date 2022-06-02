@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
+import Joi from "joi";
+
 import { UserDoc, UserDocument } from "../libs/types";
 
 const userSchema = new Schema<UserDocument>(
@@ -72,6 +74,14 @@ userSchema.methods.getToken = async (user: UserDoc) => {
     process.env.SECRET_KEY!,
     { expiresIn: "24h" }
   );
+};
+
+export const ValdateUser = (userData: UserDoc) => {
+  return Joi.object({
+    username: Joi.string().min(3).trim().required(),
+    email: Joi.string().required().email().normalize(),
+    password: Joi.string().min(4).trim().required(),
+  }).validate(userData);
 };
 
 export const User = mongoose.model<UserDocument>("User", userSchema);
