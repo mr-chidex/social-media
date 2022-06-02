@@ -1,2 +1,2 @@
-export * as User from "./users.model";
-export * as Post from "./posts.model";
+export * from "./users.model";
+export * from "./posts.model";

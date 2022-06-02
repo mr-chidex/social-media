@@ -74,4 +74,4 @@ userSchema.methods.getToken = async (user: UserDoc) => {
   );
 };
 
-export default mongoose.model<UserDocument>("User", userSchema);
+export const User = mongoose.model<UserDocument>("User", userSchema);
