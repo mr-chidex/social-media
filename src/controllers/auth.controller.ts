@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import bcrypt from "bcrypt";
 
 import { UserDoc } from "../libs/types";
-import { User, ValdateUser, getToken } from "../models";
+import { User, ValidateUser, getToken } from "../models";
 
 /**
  *
@@ -12,7 +12,7 @@ import { User, ValdateUser, getToken } from "../models";
  */
 export const signupUser: RequestHandler = async (req, res) => {
   //validate request body
-  const { error, value } = ValdateUser(req.body as UserDoc);
+  const { error, value } = ValidateUser(req.body as UserDoc);
 
   if (error) return res.status(422).json({ message: error.details[0].message });
 

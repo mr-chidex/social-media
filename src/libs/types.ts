@@ -9,6 +9,8 @@ export interface UserDoc {
   coverPic?: { url: string; id: string };
   isAdmin?: boolean;
   getToken: () => string;
+  followers?: [];
+  following?: [];
 }
 
 export interface PostDoc {

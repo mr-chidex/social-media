@@ -41,6 +41,19 @@ const userSchema = new Schema<UserDocument>(
       type: Boolean,
       default: false,
     },
+    followers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    following: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -70,17 +83,26 @@ export const getToken = (user: UserDoc) => {
       isAdmin: user.isAdmin,
       profilePic: user.profilePic,
       coverPic: user.coverPic,
+      follow: user.following,
+      followers: user.followers,
     },
     process.env.SECRET_KEY!,
     { expiresIn: "24h" }
   );
 };
 
-export const ValdateUser = (userData: UserDoc) => {
+export const ValidateUser = (userData: UserDoc) => {
   return Joi.object({
     username: Joi.string().min(3).trim().required(),
     email: Joi.string().required().email().normalize(),
     password: Joi.string().min(4).trim().required(),
+  }).validate(userData);
+};
+
+export const Validate = (userData: UserDoc) => {
+  return Joi.object({
+    username: Joi.string().min(3).trim().required(),
+    email: Joi.string().required().email().normalize(),
   }).validate(userData);
 };
 
