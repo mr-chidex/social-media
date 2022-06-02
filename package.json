@@ -10,7 +10,6 @@
     "start:clean": "rm -rf dist && tsc --build && node dist/app.js",
     "build": "tsc --build",
     "build:clean": "rm -rf dist && tsc --build",
-    "type-check": "tsc -p .",
     "lint": "eslint . --ext .ts"
   },
   "repository": {
