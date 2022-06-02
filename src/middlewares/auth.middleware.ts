@@ -3,7 +3,7 @@ import JWT from "jsonwebtoken";
 import { UserDoc } from "../libs/types";
 import { User } from "../models";
 
-export const verifyToken: RequestHandler = async (
+export const authUser: RequestHandler = async (
   req: Request | any,
   res,
   next
@@ -34,11 +34,8 @@ export const verifyToken: RequestHandler = async (
   }
 
   req.user = user;
-  next();
-};
 
-export const authUser: RequestHandler = (req: Request | any, res, next) => {
-  if (req.user?._id === req.params?.id || req.user?.isAdmin) {
+  if (req.user._id?.toString() === req.params?.id || req.user?.isAdmin) {
     next();
   } else {
     return res.status(403).json({ message: "Access denied!" });
