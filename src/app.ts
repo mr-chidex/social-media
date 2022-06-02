@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 
-import authRoute from "./routes/users.route";
+import { authRoutes } from "./routes";
 
 const app: Application = express();
 dotenv.config();
@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(helmet());
 
-app.use(`/api/${apiVersion}`, authRoute);
+app.use(`/api/${apiVersion}`, authRoutes);
 
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

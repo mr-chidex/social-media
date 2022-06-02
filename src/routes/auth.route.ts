@@ -6,4 +6,4 @@ const router = expressPromise();
 router.route("/signup").post(signupUser);
 router.route("/signin").post(signIn);
 
-export default router;
+export const authRoutes = router;
