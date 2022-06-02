@@ -8,6 +8,7 @@ export interface UserDoc {
   profilePic?: { url: string; id: string };
   coverPic?: { url: string; id: string };
   isAdmin?: boolean;
+  getToken: () => string;
 }
 
 export interface PostDoc {

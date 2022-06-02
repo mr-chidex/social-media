@@ -59,7 +59,7 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.methods.getToken = async (user: UserDoc) => {
+export const getToken = (user: UserDoc) => {
   return JWT.sign(
     {
       iat: Date.now(),
