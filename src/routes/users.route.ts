@@ -7,11 +7,11 @@ import {
   unfollowAUser,
   updateUser,
 } from "../controllers";
-import { authUser } from "../middlewares";
+import { authAdmin, authUser } from "../middlewares";
 
 const router = expressPromise();
 
-router.route("/").get(getUsers);
+router.route("/").get(authAdmin, getUsers);
 router
   .route("/:id")
   .get(authUser, getUser)

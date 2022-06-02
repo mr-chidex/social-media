@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
-import { PostDocument } from "../libs/types";
+import Joi from "joi";
+
+import { PostDoc, PostDocument } from "../libs/types";
 
 const postSchema = new Schema<PostDocument>({
   content: { type: String, default: "" },
@@ -20,5 +22,11 @@ const postSchema = new Schema<PostDocument>({
     ref: "User",
   },
 });
+
+export const ValidatePost = (post: PostDoc) => {
+  return Joi.object({
+    content: Joi.string().min(3).trim().required(),
+  }).validate(post);
+};
 
 export const Post = mongoose.model<PostDocument>("Post", postSchema);
