@@ -51,6 +51,7 @@ export const signupUser: RequestHandler = async (req, res) => {
 export const signIn: RequestHandler = async (req, res) => {
   const { username, password } = req.body as UserDoc;
 
+  //check if user exist
   const user = await User.findOne({ username });
 
   if (!user)
@@ -58,6 +59,7 @@ export const signIn: RequestHandler = async (req, res) => {
       .status(422)
       .json({ message: "username or password is incorrect" });
 
+  //check if password is correct
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch)
