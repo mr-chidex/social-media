@@ -11,8 +11,8 @@ import {
 const router = expressPromise();
 
 router.route("/").get(getUsers);
-router.route("/follow").patch(followAUser);
-router.route("/unfollow").patch(unfollowAUser);
-router.route("/:userId").get(getUser).put(updateUser).delete(deleteUser);
+router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
+router.route("/:id/follow").patch(followAUser);
+router.route("/:id/unfollow").patch(unfollowAUser);
 
 export const usersRoute = router;

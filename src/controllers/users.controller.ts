@@ -17,17 +17,17 @@ export const getUsers: RequestHandler = async (_, res) => {
 
 /**
  *
- * @route GET /api/v1/users/:userId
+ * @route GET /api/v1/users/:id
  * @desc - get a user
  * @acces Private
  */
 export const getUser: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.params;
 
-  if (!mongoose.isValidObjectId(userId))
+  if (!mongoose.isValidObjectId(id))
     return res.status(400).json({ message: "invalid user id" });
 
-  const user = await User.findById(userId)
+  const user = await User.findById(id)
     .select("-password")
     .populate({ path: "followers", select: "username email profilePic" })
     .populate({ path: "following", select: "username email profilePic" });
@@ -39,17 +39,17 @@ export const getUser: RequestHandler = async (req, res) => {
 
 /**
  *
- * @route DELETE /api/v1/users/:userId
+ * @route DELETE /api/v1/users/:id
  * @desc - delete a user
  * @acces Private
  */
 export const deleteUser: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.params;
 
-  if (!mongoose.isValidObjectId(userId))
+  if (!mongoose.isValidObjectId(id))
     return res.status(400).json({ message: "invalid user id" });
 
-  const user = await User.findByIdAndDelete(userId);
+  const user = await User.findByIdAndDelete(id);
   if (!user) return res.status(400).json({ message: " user does not exist" });
 
   res.status(200).json({ message: "user deleted" });
@@ -57,18 +57,18 @@ export const deleteUser: RequestHandler = async (req, res) => {
 
 /**
  *
- * @route PUT /api/v1/users/:userId
+ * @route PUT /api/v1/users/:id
  * @desc - update a user
  * @acces Private
  */
 export const updateUser: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.params;
 
-  if (!mongoose.isValidObjectId(userId))
+  if (!mongoose.isValidObjectId(id))
     return res.status(400).json({ message: "invalid user id" });
 
   const user = await User.findByIdAndUpdate(
-    { _id: userId },
+    { _id: id },
     { $set: req.body },
     { new: true }
   );
@@ -78,36 +78,36 @@ export const updateUser: RequestHandler = async (req, res) => {
 
 /**
  *
- * @route PATCH /api/v1/users/follow?userId=id&followerId=id
+ * @route PATCH /api/v1/users/:id/follow?userId=id
  * @desc - follow a user
  * @acces Private
  */
 export const followAUser: RequestHandler = async (req, res) => {
   const { userId } = req.query;
-  const { followerId } = req.query as never;
+  const { id } = req.params as never;
 
   if (!mongoose.isValidObjectId(userId))
     return res.status(400).json({ message: "invalid user id" });
 
-  if (!mongoose.isValidObjectId(followerId))
+  if (!mongoose.isValidObjectId(id))
     return res.status(400).json({ message: "invalid follow id of user" });
 
-  if (userId === followerId)
+  if (userId === id)
     return res.status(403).json({ message: "cannot follow yourself" });
 
   const user = await User.findById(userId);
   if (!user) return res.status(400).json({ message: "user not found" });
 
-  const followerUser = await User.findById(followerId);
+  const followerUser = await User.findById(id);
   if (!followerUser) return res.status(400).json({ message: "user not found" });
 
   // check if user is already followed
-  if (user.followers?.includes(followerId)) {
-    return res.status(403).json({ message: "user already followed" });
+  if (user.followers?.includes(id)) {
+    return res.status(403).json({ message: "You already followed this user" });
   }
 
   //update followers and followings
-  await user.updateOne({ $push: { followers: followerId } });
+  await user.updateOne({ $push: { followers: id } });
   await followerUser.updateOne({ $push: { following: userId } });
 
   res.json({ message: "user followed" });
@@ -115,38 +115,38 @@ export const followAUser: RequestHandler = async (req, res) => {
 
 /**
  *
- * @route PATCH /api/v1/users/unfollow?userId=id&followerId=id
+ * @route PATCH /api/v1/users/:id/unfollow?userId=id
  * @desc - unfollow a user
  * @acces Private
  */
 export const unfollowAUser: RequestHandler = async (req, res) => {
   const { userId } = req.query;
-  const { followerId } = req.query as never;
+  const { id } = req.params as never;
 
   if (!mongoose.isValidObjectId(userId))
     return res.status(400).json({ message: "invalid user id" });
 
-  if (!mongoose.isValidObjectId(followerId))
+  if (!mongoose.isValidObjectId(id))
     return res.status(400).json({ message: "invalid follow id of user" });
 
-  if (userId === followerId)
+  if (userId === id)
     return res.status(403).json({ message: "cannot unfollow yourself" });
 
   const user = await User.findById(userId);
   if (!user) return res.status(400).json({ message: "user not found" });
 
-  const followerUser = await User.findById(followerId);
+  const followerUser = await User.findById(id);
   if (!followerUser) return res.status(400).json({ message: "user not found" });
 
   // check if you're following user
-  if (!user.followers?.includes(followerId)) {
+  if (!user.followers?.includes(id)) {
     return res
       .status(403)
       .json({ message: "can't unfollow a user you're not following" });
   }
 
   //update followers and followings
-  await user.updateOne({ $pull: { followers: followerId } });
+  await user.updateOne({ $pull: { followers: id } });
   await followerUser.updateOne({ $pull: { following: userId } });
 
   res.json({ message: "user unfollowed" });
