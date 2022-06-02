@@ -10,4 +10,12 @@ export interface UserDoc {
   isAdmin?: boolean;
 }
 
+export interface PostDoc {
+  content: string;
+  image?: { url: string; id: string };
+  likes: number;
+  user: string;
+}
+
 export type UserDocument = UserDoc & Document;
+export type PostDocument = PostDoc & Document;
