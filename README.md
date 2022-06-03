@@ -1,4 +1,4 @@
-## An API for a Social Media
+## API for a Social Media
 
 A Node JS RESTful API. Socal Media ApI
 
