@@ -16,7 +16,7 @@ export interface UserDoc {
 export interface PostDoc {
   content: string;
   image?: { url: string; id: string };
-  likes: number;
+  likes: [];
   user: string;
 }
 

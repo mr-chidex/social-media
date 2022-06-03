@@ -107,8 +107,8 @@ export const followAUser: RequestHandler = async (req, res) => {
   }
 
   //update followers and followings
-  await user.updateOne({ $push: { followers: id } });
-  await followerUser.updateOne({ $push: { following: userId } });
+  await user.updateOne({ $addToSet: { followers: id } });
+  await followerUser.updateOne({ $addToSet: { following: userId } });
 
   res.json({ message: "user followed" });
 };

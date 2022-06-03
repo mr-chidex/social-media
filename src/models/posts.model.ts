@@ -12,10 +12,13 @@ const postSchema = new Schema<PostDocument>({
       id: String,
     },
   },
-  likes: {
-    type: Number,
-    default: 0,
-  },
+  likes: [
+    {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+  ],
   user: {
     type: Schema.Types.ObjectId,
     required: true,
