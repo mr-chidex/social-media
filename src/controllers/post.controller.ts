@@ -1,7 +1,7 @@
-import { RequestHandler, Request } from "express";
+import { RequestHandler } from "express";
 import mongoose from "mongoose";
 
-import { PostDoc } from "../libs/types";
+import { IRequest, PostDoc } from "../libs/types";
 import { Post, User, ValidatePost } from "../models";
 
 /**
@@ -10,14 +10,14 @@ import { Post, User, ValidatePost } from "../models";
  * @desc - create post
  * @acces Private
  */
-export const createPost: RequestHandler = async (req: Request | any, res) => {
+export const createPost: RequestHandler = async (req: IRequest, res) => {
   const { error, value } = ValidatePost(req.body as PostDoc);
 
   if (error) return res.status(422).json({ message: error.details[0].message });
 
   const { content } = value as PostDoc;
 
-  const post = new Post({ content, user: req.user._id });
+  const post = new Post({ content, user: req.user?._id });
 
   await post.save();
 
@@ -30,7 +30,7 @@ export const createPost: RequestHandler = async (req: Request | any, res) => {
  * @desc - get all post
  * @acces Private
  */
-export const getPosts: RequestHandler = async (req, res) => {
+export const getPosts: RequestHandler = async (_, res) => {
   const posts = await Post.find();
 
   res.json({ posts });
@@ -64,13 +64,21 @@ export const getPost: RequestHandler = async (req, res) => {
  * @desc - delete post
  * @acces Private
  */
-export const deletePost: RequestHandler = async (req, res) => {
+export const deletePost: RequestHandler = async (req: IRequest, res) => {
   const { postId } = req.params;
+  const userId = req.user?._id;
+  const isAdmin = req.user?.isAdmin;
 
   if (!mongoose.isValidObjectId(postId))
     return res.status(400).json({ message: "invalid post id" });
 
-  const post = await Post.findByIdAndDelete(postId);
+  let post: PostDoc | null;
+
+  if (isAdmin) {
+    post = await Post.findByIdAndDelete(postId);
+  } else {
+    post = await Post.findOneAndDelete({ _id: postId, user: userId });
+  }
 
   if (!post) return res.status(400).json({ message: " post does not exist" });
 
@@ -83,7 +91,9 @@ export const deletePost: RequestHandler = async (req, res) => {
  * @desc - update post
  * @acces Private
  */
-export const updatePost: RequestHandler = async (req, res) => {
+export const updatePost: RequestHandler = async (req: IRequest, res) => {
+  const userId = req.user?._id;
+
   const { error, value } = ValidatePost(req.body as PostDoc);
 
   if (error) return res.status(422).json({ message: error.details[0].message });
@@ -95,8 +105,8 @@ export const updatePost: RequestHandler = async (req, res) => {
   if (!mongoose.isValidObjectId(postId))
     return res.status(400).json({ message: "invalid post id" });
 
-  const post = await Post.findByIdAndUpdate(
-    { _id: postId },
+  const post = await Post.findOneAndUpdate(
+    { _id: postId, user: userId },
     { $set: { content } },
     { new: true }
   );
@@ -108,13 +118,13 @@ export const updatePost: RequestHandler = async (req, res) => {
 
 /**
  *
- * @route PATCH /api/v1/posts/:postId/like?userd=id
+ * @route PATCH /api/v1/posts/:postId/like
  * @desc - like post
  * @acces Private
  */
-export const likePost: RequestHandler = async (req, res) => {
+export const likePost: RequestHandler = async (req: IRequest, res) => {
   const { postId } = req.params;
-  const { userId } = req.query as never;
+  const userId = req.user?._id as never;
 
   if (!mongoose.isValidObjectId(postId))
     return res.status(400).json({ message: "invalid post id" });
@@ -139,10 +149,7 @@ export const likePost: RequestHandler = async (req, res) => {
   res.json({ message: "post liked" });
 };
 
-export const getTimelinePosts: RequestHandler = async (
-  req: Request | any,
-  res
-) => {
+export const getTimelinePosts: RequestHandler = async (req: IRequest, res) => {
   const userId = req.user?._id;
 
   if (!mongoose.isValidObjectId(userId))

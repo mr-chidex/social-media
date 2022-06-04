@@ -16,7 +16,7 @@ router.route("/").post(verifyUser, createPost).get(getPosts);
 router.route("/timeline").get(verifyUser, getTimelinePosts);
 router
   .route("/:postId")
-  .get(verifyUser, getPost)
+  .get(getPost)
   .delete(verifyUser, deletePost)
   .put(verifyUser, updatePost);
 router.route("/:postId/like").patch(verifyUser, likePost);

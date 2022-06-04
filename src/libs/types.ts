@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { Document } from "mongoose";
 
 export interface UserDoc {
@@ -18,6 +19,10 @@ export interface PostDoc {
   image?: { url: string; id: string };
   likes: [];
   user: string;
+}
+
+export interface IRequest extends Request {
+  user?: { _id: string; isAdmin: boolean };
 }
 
 export type UserDocument = UserDoc & Document;
