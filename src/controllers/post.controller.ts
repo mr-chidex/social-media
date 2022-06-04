@@ -151,5 +151,14 @@ export const getTimelinePosts: RequestHandler = async (
   const user = await User.findById(userId);
   if (!user) return res.status(400).json({ message: "user not found" });
 
-  // const userPosts = await Post.find({ user: userId });
+  let userPosts = await Post.find({ user: userId });
+
+  await Promise.all(
+    user.following?.map(async (follId: string) => {
+      const post = await Post.find({ user: follId });
+      userPosts = [...userPosts, ...post];
+    }) as []
+  );
+
+  res.json({ posts: userPosts });
 };

@@ -4,6 +4,7 @@ import {
   deletePost,
   getPost,
   getPosts,
+  getTimelinePosts,
   likePost,
   updatePost,
 } from "../controllers";
@@ -12,6 +13,7 @@ import { verifyUser } from "../middlewares";
 const router = expressPromise();
 
 router.route("/").post(verifyUser, createPost).get(getPosts);
+router.route("/timeline").get(verifyUser, getTimelinePosts);
 router
   .route("/:postId")
   .get(verifyUser, getPost)
