@@ -41,46 +41,6 @@ export const updateUser: RequestHandler = async (req: IRequest, res) => {
 
 /**
  *
- * @route GET /api/v1/users/:id
- * @desc - get a user
- * @acces Private
- */
-export const getUser: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.isValidObjectId(id))
-    return res.status(400).json({ message: "invalid user id" });
-
-  const user = await User.findById(id)
-    .select("-password")
-    .populate({ path: "followers", select: "username email profilePic" })
-    .populate({ path: "following", select: "username email profilePic" });
-
-  if (!user) return res.status(400).json({ message: " user does not exist" });
-
-  res.json({ user });
-};
-
-/**
- *
- * @route DELETE /api/v1/users/:id
- * @desc - delete a user
- * @acces Private
- */
-export const deleteUser: RequestHandler = async (req: IRequest, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.isValidObjectId(id))
-    return res.status(400).json({ message: "invalid user id" });
-
-  const user = await User.findByIdAndDelete(id);
-  if (!user) return res.status(400).json({ message: "user does not exist" });
-
-  res.status(200).json({ message: "user deleted" });
-};
-
-/**
- *
  * @route PATCH /api/v1/users/follow?userId=id
  * @desc - follow a user
  * @acces Private
@@ -118,7 +78,7 @@ export const followAUser: RequestHandler = async (req: IRequest, res) => {
 
 /**
  *
- * @route PATCH /api/v1/users/:id/unfollow?userId=id
+ * @route PATCH /api/v1/users/unfollow?userId=id
  * @desc - unfollow a user
  * @acces Private
  */
@@ -153,4 +113,44 @@ export const unfollowAUser: RequestHandler = async (req: IRequest, res) => {
   await currentUser.updateOne({ $pull: { following: userId } });
 
   res.json({ message: "user unfollowed" });
+};
+
+/**
+ *
+ * @route GET /api/v1/users/:id
+ * @desc - get a user
+ * @acces Private
+ */
+export const getUser: RequestHandler = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id))
+    return res.status(400).json({ message: "invalid user id" });
+
+  const user = await User.findById(id)
+    .select("-password")
+    .populate({ path: "followers", select: "username email profilePic" })
+    .populate({ path: "following", select: "username email profilePic" });
+
+  if (!user) return res.status(400).json({ message: " user does not exist" });
+
+  res.json({ user });
+};
+
+/**
+ *
+ * @route DELETE /api/v1/users/:id
+ * @desc - delete a user
+ * @acces Private
+ */
+export const deleteUser: RequestHandler = async (req: IRequest, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id))
+    return res.status(400).json({ message: "invalid user id" });
+
+  const user = await User.findByIdAndDelete(id);
+  if (!user) return res.status(400).json({ message: "user does not exist" });
+
+  res.status(200).json({ message: "user deleted" });
 };

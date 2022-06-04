@@ -22,7 +22,7 @@ app.use(`/api/${apiVersion}/users`, usersRoute);
 app.use(`/api/${apiVersion}/posts`, postsRoute);
 
 // error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   if (process.env.NODE_ENV === "development") {
     return res
       .status(500)

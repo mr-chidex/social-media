@@ -86,7 +86,7 @@ export const getToken = (user: UserDoc) => {
       follow: user.following,
       followers: user.followers,
     },
-    process.env.SECRET_KEY!,
+    process.env.SECRET_KEY as string,
     { expiresIn: "24h" }
   );
 };
