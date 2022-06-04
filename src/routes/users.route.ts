@@ -7,17 +7,13 @@ import {
   unfollowAUser,
   updateUser,
 } from "../controllers";
-import { authAdmin, authUser } from "../middlewares";
+import { authUser, verifyUser } from "../middlewares";
 
 const router = expressPromise();
 
-router.route("/").get(authAdmin, getUsers);
-router
-  .route("/:id")
-  .get(authUser, getUser)
-  .put(authUser, updateUser)
-  .delete(authUser, deleteUser);
-router.route("/:id/follow").patch(authUser, followAUser);
-router.route("/:id/unfollow").patch(authUser, unfollowAUser);
+router.route("/").get(verifyUser, getUsers).put(verifyUser, updateUser);
+router.route("/follow").patch(verifyUser, followAUser);
+router.route("/unfollow").patch(verifyUser, unfollowAUser);
+router.route("/:id").get(verifyUser, getUser).delete(authUser, deleteUser);
 
 export const usersRoute = router;

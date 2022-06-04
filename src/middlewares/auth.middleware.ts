@@ -24,7 +24,7 @@ export const authUser: RequestHandler = async (
       status: "error",
     });
 
-  const decodeToken = JWT.verify(token, process.env.SECRET_KEY!);
+  const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
   const user = await User.findById((decodeToken as UserDoc)._id);
 
   if (!user) {
@@ -35,7 +35,7 @@ export const authUser: RequestHandler = async (
 
   req.user = user;
 
-  if (req.user._id?.toString() === req.params?.id || req.user?.isAdmin) {
+  if (req.user?._id?.toString() === req.params?.id || req.user?.isAdmin) {
     next();
   } else {
     return res.status(403).json({ message: "Access denied!" });
@@ -63,7 +63,7 @@ export const authAdmin: RequestHandler = async (
       status: "error",
     });
 
-  const decodeToken = JWT.verify(token, process.env.SECRET_KEY!);
+  const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
   const user = await User.findById((decodeToken as UserDoc)._id);
 
   if (!user) {
@@ -102,7 +102,7 @@ export const verifyUser: RequestHandler = async (
       status: "error",
     });
 
-  const decodeToken = JWT.verify(token, process.env.SECRET_KEY!);
+  const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
   const user = await User.findById((decodeToken as UserDoc)._id);
 
   if (!user) {
