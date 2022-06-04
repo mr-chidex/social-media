@@ -16,7 +16,7 @@ export const createPost: RequestHandler = async (req: Request | any, res) => {
   if (error) return res.status(422).json({ message: error.details[0].message });
 
   const { content } = value as PostDoc;
-  console.log("sjhd");
+
   const post = new Post({ content, user: req.user._id });
 
   await post.save();
@@ -137,4 +137,19 @@ export const likePost: RequestHandler = async (req, res) => {
   await post.updateOne({ $addToSet: { likes: userId } });
 
   res.json({ message: "post liked" });
+};
+
+export const getTimelinePosts: RequestHandler = async (
+  req: Request | any,
+  res
+) => {
+  const userId = req.user?._id;
+
+  if (!mongoose.isValidObjectId(userId))
+    return res.status(400).json({ message: "invalid user id" });
+
+  const user = await User.findById(userId);
+  if (!user) return res.status(400).json({ message: "user not found" });
+
+  // const userPosts = await Post.find({ user: userId });
 };
