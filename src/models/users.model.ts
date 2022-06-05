@@ -58,6 +58,16 @@ const userSchema = new Schema<UserDocument>(
   { timestamps: true }
 );
 
+//modify json data
+userSchema.methods.toJSON = function () {
+  const user = this as any;
+  const userObject = user.toObject();
+  delete userObject.password;
+  delete userObject["__v"];
+
+  return userObject;
+};
+
 userSchema.pre("save", async function (next) {
   try {
     if (!this.isModified("password")) return next();

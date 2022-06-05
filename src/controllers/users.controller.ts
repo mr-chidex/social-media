@@ -11,7 +11,7 @@ import { User } from "../models";
  * @acces Private
  */
 export const getUsers: RequestHandler = async (_, res) => {
-  const users = await User.find().select("-password").sort({ _id: -1 });
+  const users = await User.find().sort({ _id: -1 });
 
   res.json({ users });
 };
@@ -123,7 +123,6 @@ export const getUser: RequestHandler = async (req, res) => {
     return res.status(400).json({ message: "invalid user id" });
 
   const user = await User.findById(id)
-    .select("-password")
     .populate({ path: "followers", select: "username email profilePic" })
     .populate({ path: "following", select: "username email profilePic" });
 
