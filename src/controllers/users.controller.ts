@@ -31,11 +31,6 @@ export const updateUser: RequestHandler = async (req: IRequest, res) => {
     { new: true }
   );
 
-  if (!user)
-    return res
-      .status(403)
-      .json({ message: "Access denied::can only update your profile" });
-
   res.json(user);
 };
 
