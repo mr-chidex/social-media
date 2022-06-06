@@ -21,6 +21,11 @@ export interface PostDoc {
   user: string;
 }
 
+export interface Image {
+  url: string;
+  id: string;
+}
+
 export interface IRequest extends Request {
   user?: { _id: string; isAdmin: boolean };
 }

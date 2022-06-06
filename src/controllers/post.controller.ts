@@ -1,8 +1,10 @@
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
 
-import { IRequest, PostDoc } from "../libs/types";
+import { Image, IRequest, PostDoc } from "../libs/types";
 import { Post, User, ValidatePost } from "../models";
+import cloudinary from "../utils/cloudinary";
+const folder = "image/socialMedia";
 
 /**
  *
@@ -17,7 +19,27 @@ export const createPost: RequestHandler = async (req: IRequest, res) => {
 
   const { content } = value as PostDoc;
 
-  const post = new Post({ content, user: req.user?._id });
+  if (!req.file)
+    return res.status(422).json({ message: "post image not uploaded" });
+
+  const image: Image = { url: "", id: "" };
+
+  try {
+    const uploadedImage = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder,
+    });
+
+    image.url = uploadedImage.secure_url;
+    image.id = uploadedImage.public_id?.split("/")[2];
+  } catch (err) {
+    throw new Error("error uploading file");
+  }
+
+  const post = new Post({
+    content,
+    user: req.user?._id,
+    image,
+  });
 
   await post.save();
 
@@ -31,7 +53,7 @@ export const createPost: RequestHandler = async (req: IRequest, res) => {
  * @acces Private
  */
 export const getPosts: RequestHandler = async (_, res) => {
-  const posts = await Post.find();
+  const posts = await Post.find().sort({ _id: -1 });
 
   res.json({ posts });
 };
@@ -111,7 +133,27 @@ export const updatePost: RequestHandler = async (req: IRequest, res) => {
     { new: true }
   );
 
-  if (!post) return res.status(400).json({ message: " post does not exist" });
+  if (!post) return res.status(400).json({ message: "post does not exist" });
+
+  if (req.file) {
+    try {
+      post?.image?.id &&
+        (await cloudinary.v2.uploader.destroy(post?.image?.id));
+
+      const uploadedImage = await cloudinary.v2.uploader.upload(req.file.path, {
+        folder,
+      });
+
+      post.image = {
+        url: uploadedImage.secure_url,
+        id: uploadedImage.public_id?.split("/")[2],
+      };
+
+      await post.save();
+    } catch (err) {
+      throw new Error("error uploading file");
+    }
+  }
 
   res.json({ message: "post updated" });
 };

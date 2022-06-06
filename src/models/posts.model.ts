@@ -7,10 +7,6 @@ const postSchema = new Schema<PostDocument>({
   content: { type: String, default: "" },
   image: {
     type: Object,
-    default: {
-      url: String,
-      id: String,
-    },
   },
   likes: [
     {
