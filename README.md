@@ -1,6 +1,6 @@
 ## API for a Social Media
 
-A Node JS RESTful API. Socal Media ApI
+A Node JS service RESTful API. Social Media ApI
 
 ## Built With
 
@@ -11,6 +11,7 @@ A Node JS RESTful API. Socal Media ApI
 - Json Web Token
 - Postman
 - TypeScript
+- Cloudinary
 
 ## Clone this project
 

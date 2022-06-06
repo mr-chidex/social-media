@@ -104,6 +104,9 @@ export const deletePost: RequestHandler = async (req: IRequest, res) => {
 
   if (!post) return res.status(400).json({ message: " post does not exist" });
 
+  //delete image
+  post.image?.id && (await cloudinary.v2.uploader.destroy(post.image?.id));
+
   res.json({ message: "post deleted" });
 };
 
@@ -137,9 +140,11 @@ export const updatePost: RequestHandler = async (req: IRequest, res) => {
 
   if (req.file) {
     try {
+      //delete old image
       post?.image?.id &&
         (await cloudinary.v2.uploader.destroy(post?.image?.id));
 
+      //upload new image
       const uploadedImage = await cloudinary.v2.uploader.upload(req.file.path, {
         folder,
       });

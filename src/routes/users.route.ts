@@ -7,11 +7,21 @@ import {
   unfollowAUser,
   updateUser,
 } from "../controllers";
-import { authUser, verifyUser } from "../middlewares";
+import { authUser, verifyUser, uploads } from "../middlewares";
 
 const router = expressPromise();
 
-router.route("/").get(verifyUser, getUsers).put(verifyUser, updateUser);
+router
+  .route("/")
+  .get(verifyUser, getUsers)
+  .put(
+    verifyUser,
+    uploads.fields([
+      { name: "profilePic", maxCount: 1 },
+      { name: "coverPic", maxCount: 1 },
+    ]),
+    updateUser
+  );
 router.route("/follow").patch(verifyUser, followAUser);
 router.route("/unfollow").patch(verifyUser, unfollowAUser);
 router.route("/:id").get(verifyUser, getUser).delete(authUser, deleteUser);

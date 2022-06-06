@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
-import { IRequest } from "../libs/types";
 
+import { IRequest, UserDoc, UserDocument } from "../libs/types";
 import { User } from "../models";
+import cloudinary from "../utils/cloudinary";
 
 /**
  *
@@ -25,11 +26,58 @@ export const getUsers: RequestHandler = async (_, res) => {
 export const updateUser: RequestHandler = async (req: IRequest, res) => {
   const userId = req.user?._id;
 
-  const user = await User.findByIdAndUpdate(
-    { _id: userId },
-    { $set: req.body },
-    { new: true }
-  );
+  const { username, email } = req.body as UserDoc;
+
+  const user = (await User.findById(userId)) as UserDocument;
+
+  if (user.username !== username) {
+    const isExist = await User.findOne({ username });
+    if (isExist)
+      return res.status(400).json({ message: "username already in use" });
+  }
+
+  if (user.email !== email) {
+    const isExist = await User.findOne({ email });
+    if (isExist)
+      return res.status(400).json({ message: "email already in use" });
+  }
+
+  user.username = username;
+  user.email = email;
+
+  const { profilePic, coverPic } = req.files as any;
+
+  if (profilePic) {
+    //delete old image
+    user.profilePic?.id &&
+      (await cloudinary.v2.uploader.destroy(user.profilePic.id));
+
+    //upload new
+    const profileImage = await cloudinary.v2.uploader.upload(
+      profilePic[0].path
+    );
+
+    user.profilePic = {
+      url: profileImage.secure_url,
+      id: profileImage.public_id,
+    };
+  }
+
+  if (coverPic) {
+    //delete old image
+    user.coverPic?.id &&
+      (await cloudinary.v2.uploader.destroy(user.coverPic.id));
+
+    //upload new
+    const coverImage = await cloudinary.v2.uploader.upload(coverPic[0].path);
+
+    user.coverPic = {
+      url: coverImage.secure_url,
+      id: coverImage.public_id,
+    };
+  }
+
+  await user.save();
 
   res.json(user);
 };
@@ -145,6 +193,11 @@ export const deleteUser: RequestHandler = async (req: IRequest, res) => {
 
   const user = await User.findByIdAndDelete(id);
   if (!user) return res.status(400).json({ message: "user does not exist" });
+
+  //destroy images if exist
+  user.profilePic?.id &&
+    (await cloudinary.v2.uploader.destroy(user.profilePic.id));
+  user.coverPic?.id && (await cloudinary.v2.uploader.destroy(user.coverPic.id));
 
   res.status(200).json({ message: "user deleted" });
 };
