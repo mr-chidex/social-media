@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "start": "tsc --build && node dist/index.js",
-    "preinstall": "tsc",
+    "postinstall": "tsc",
     "start:clean": "rm -rf dist && tsc --build && node dist/index.js",
     "build": "tsc --build",
     "build:clean": "rm -rf dist && tsc --build",
