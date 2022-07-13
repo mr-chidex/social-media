@@ -24,21 +24,25 @@ export const authUser: RequestHandler = async (
       status: "error",
     });
 
-  const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
-  const user = await User.findById((decodeToken as UserDoc)._id);
+  try {
+    const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
+    const user = await User.findById((decodeToken as UserDoc)._id);
 
-  if (!user) {
-    res
-      .status(401)
-      .json({ message: "Unauthorized access: User does not exist" });
-  }
+    if (!user) {
+      res
+        .status(401)
+        .json({ message: "Unauthorized access: User does not exist" });
+    }
 
-  req.user = user;
+    req.user = user;
 
-  if (req.user?._id?.toString() === req.params?.id || req.user?.isAdmin) {
-    next();
-  } else {
-    return res.status(403).json({ message: "Access denied!" });
+    if (req.user?._id?.toString() === req.params?.id || req.user?.isAdmin) {
+      next();
+    } else {
+      return res.status(403).json({ message: "Access denied!" });
+    }
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -63,21 +67,25 @@ export const authAdmin: RequestHandler = async (
       status: "error",
     });
 
-  const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
-  const user = await User.findById((decodeToken as UserDoc)._id);
+  try {
+    const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
+    const user = await User.findById((decodeToken as UserDoc)._id);
 
-  if (!user) {
-    res
-      .status(401)
-      .json({ message: "Unauthorized access: User does not exist" });
-  }
+    if (!user) {
+      res
+        .status(401)
+        .json({ message: "Unauthorized access: User does not exist" });
+    }
 
-  req.user = user;
+    req.user = user;
 
-  if (req.user?.isAdmin) {
-    next();
-  } else {
-    return res.status(403).json({ message: "Access denied!" });
+    if (req.user?.isAdmin) {
+      next();
+    } else {
+      return res.status(403).json({ message: "Access denied!" });
+    }
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -102,16 +110,20 @@ export const verifyUser: RequestHandler = async (
       status: "error",
     });
 
-  const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
-  const user = await User.findById((decodeToken as UserDoc)._id);
+  try {
+    const decodeToken = JWT.verify(token, process.env.SECRET_KEY as string);
+    const user = await User.findById((decodeToken as UserDoc)._id);
 
-  if (!user) {
-    res
-      .status(401)
-      .json({ message: "Unauthorized access: User does not exist" });
+    if (!user) {
+      res
+        .status(401)
+        .json({ message: "Unauthorized access: User does not exist" });
+    }
+
+    req.user = user;
+
+    next();
+  } catch (error) {
+    next(error);
   }
-
-  req.user = user;
-
-  next();
 };

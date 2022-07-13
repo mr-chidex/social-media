@@ -30,7 +30,7 @@ export const signupUser: RequestHandler = async (req, res) => {
   if (userExist)
     return res
       .status(400)
-      .json({ message: "email already in user", status: "error" });
+      .json({ message: "email already in use", status: "error" });
 
   const user = new User({
     username,
