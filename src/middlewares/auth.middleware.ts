@@ -29,7 +29,7 @@ export const authUser: RequestHandler = async (
     const user = await User.findById((decodeToken as UserDoc)._id);
 
     if (!user) {
-      res
+      return res
         .status(401)
         .json({ message: "Unauthorized access: User does not exist" });
     }
@@ -72,7 +72,7 @@ export const authAdmin: RequestHandler = async (
     const user = await User.findById((decodeToken as UserDoc)._id);
 
     if (!user) {
-      res
+      return res
         .status(401)
         .json({ message: "Unauthorized access: User does not exist" });
     }
@@ -115,7 +115,7 @@ export const verifyUser: RequestHandler = async (
     const user = await User.findById((decodeToken as UserDoc)._id);
 
     if (!user) {
-      res
+      return res
         .status(401)
         .json({ message: "Unauthorized access: User does not exist" });
     }
